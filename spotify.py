@@ -50,12 +50,12 @@ df = pd.read_csv(filename)
 html = []
 
 for i in range(len(df)):
-    artist = df.iloc[i]['artist'].replace(" / ", ", ")
+    artist = df.iloc[i]['artist'].replace(" / ", ", ").replace(" & ", " ")
     if 'various' in artist.lower():
         artist_param = ''
     else:
         artist_param = ' artist:' + artist
-    album = df.iloc[i]['album']
+    album = df.iloc[i]['album'].replace(" / ", ", ").replace(" & ", " ")
     query = 'album:' + album + artist_param
 
     headers = {'Authorization': 'Bearer {token}'.format(token=token)}
@@ -67,10 +67,9 @@ for i in range(len(df)):
         params=params
     )
 
-    print('artist:', artist, 'album', album, data.status_code)
-
     if data.status_code == 200:
         if len(data.json()['albums']['items']) > 0:
+            print(str(i+1), ':', 'artist:', artist, 'album:', album, 'available: Yes')
             album_data = data.json()
             album_id = album_data['albums']['items'][0]['id']
 
@@ -85,8 +84,10 @@ for i in range(len(df)):
             code = base + album_id + '"' + ' width=' + width + ' height=' + height + ' frameborder=' + frame_border \
                 + ' allowtransparency=' + allow_transparency + ' allow=' + allow + '"></iframe>'
         else:
+            print(str(i + 1), ':', 'artist:', artist, 'album:', album, 'available: No')
             code = "Not available"
     else:
+        print(str(i + 1), ':', 'artist:', artist, 'album:', album, 'available: No')
         code = 'Not available'
 
     html.append(code)
