@@ -7,6 +7,8 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import pandas as pd
+import shutil
+import os
 
 url_2019 = "https://boomkat.com/charts/boomkat-end-of-year-charts-2019/940"
 url_2020 = "https://boomkat.com/charts/boomkat-end-of-year-charts-2020/1234"
@@ -40,6 +42,27 @@ for result in results:
         #else:
         #    pass
         album = release.find(class_='release__title').text.strip()
+
+        try:
+            image = str(result.find(class_='chart-item-image').find('img'))
+            image_url = re.findall(r'src="(.*)"\s', image)[0]
+            image_ext = os.path.splitext(image_url)[1]
+            filename = artist + " - " + album + image_ext
+
+            image_r = requests.get(image_url, stream=True)
+            if image_r.status_code == 200:
+                image_r.raw.decode_content = True
+                if not os.path.exists('images'):
+                    os.makedirs('images')
+                with open('images/' + filename, 'wb') as f:
+                    shutil.copyfileobj(image_r.raw, f)
+                print('Successfully downloaded: ', filename)
+            else:
+                print('Image could not be retrieved.')
+
+        except:
+            pass
+
         try:
             genre = release.find(class_='release__genre').text.strip()
         except:
