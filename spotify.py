@@ -94,4 +94,4 @@ for i in range(len(df)):
 
 df['html'] = pd.Series(html)
 
-df.to_csv(site + "_" + year + "_html.csv", index=False)
+df.to_csv("data/" + site + "_" + year + "_html.csv", index=False)

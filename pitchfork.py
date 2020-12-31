@@ -67,4 +67,6 @@ df['review'] = rf
 df = df.sort_values('rank', ascending=True)
 
 filename = "pitchfork_" + user_year + ".csv"
-df.to_csv(filename, index=False, encoding='utf-8-sig')
+if not os.path.exists('data'):
+    os.makedirs('data')
+df.to_csv("data/" + filename, index=False, encoding='utf-8-sig')
