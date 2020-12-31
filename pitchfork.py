@@ -50,7 +50,7 @@ for paragraph in paragraphs:
 
     if paragraph_len > 10 and max_end > 1:
         short_review = text[0:max_end]
-        print(short_review + "\n")
+        #print(short_review + "\n")
         tl.append(short_review)
     else:
         pass
