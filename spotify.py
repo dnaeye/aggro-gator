@@ -5,7 +5,6 @@
 # Import libraries
 import pandas as pd
 import requests
-import json
 from spotify_secrets import *  # Simple .py file declaring client_id and client_secret variables
 
 # Authorization
@@ -24,7 +23,7 @@ token = auth_response_data['access_token']
 # Search
 endpoint = "https://api.spotify.com/v1/search"
 
-# Import data
+# Get user input
 class import_data:
     def __init__(self):
         self.site = input("Enter site code (Pitchfork=p, Boomkat=b): ")
@@ -43,18 +42,24 @@ else:
     print('Enter appropriate code.')
 year = user_input.year
 
+# Initialize data objects
 filename = site + "_" + year + ".csv"
 
-df = pd.read_csv(filename)
+# Import album data
+df = pd.read_csv("data/" + filename)
 
 html = []
 
+# Get Spotify ID for each album and create HTML code for embeddable Spotify player
 for i in range(len(df)):
+
+    # Create request to Spotify API
     artist = df.iloc[i]['artist'].replace(" / ", ", ").replace(" & ", " ")
     if 'various' in artist.lower():
         artist_param = ''
     else:
         artist_param = ' artist:' + artist
+
     album = df.iloc[i]['album'].replace(" / ", ", ").replace(" & ", " ")
     query = 'album:' + album + artist_param
 
@@ -67,14 +72,14 @@ for i in range(len(df)):
         params=params
     )
 
+    # Create embeddable player HTML code
+    # See https://developer.spotify.com/documentation/widgets/generate/embed/
     if data.status_code == 200:
         if len(data.json()['albums']['items']) > 0:
             print(str(i+1), ':', 'artist:', artist, 'album:', album, 'available: Yes')
             album_data = data.json()
             album_id = album_data['albums']['items'][0]['id']
 
-            # Create embeddable player HTML code
-            # See https://developer.spotify.com/documentation/widgets/generate/embed/
             width = '"300"'
             height = '"80"'
             base = '<iframe src="https://open.spotify.com/embed/album/'
@@ -94,4 +99,5 @@ for i in range(len(df)):
 
 df['html'] = pd.Series(html)
 
+# Output data to file
 df.to_csv("data/" + site + "_" + year + "_html.csv", index=False)
