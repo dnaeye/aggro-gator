@@ -47,8 +47,12 @@ for result in results:
         album = release.find(class_='release__title').text.strip()
 
         # Create Boomkat review URL
-        review_url = "https://boomkat.com" + result.find('div', class_='chart-item-link chart-item-link--fulldetails')\
-            .find('a', href=True)['href']
+        try:
+            review_url = "https://boomkat.com" + \
+                         result.find('div', class_='chart-item-link chart-item-link--fulldetails')\
+                             .find('a', href=True)['href']
+        except:
+            review_url = "https://boomkat.com"
 
         # Get album images
         # try:

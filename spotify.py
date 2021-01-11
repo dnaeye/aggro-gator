@@ -48,7 +48,7 @@ filename = site + "_" + year + ".csv"
 # Import album data
 df = pd.read_csv("data/" + filename)
 
-html = []
+album_ids = []
 
 # Get Spotify ID for each album and create HTML code for embeddable Spotify player
 for i in range(len(df)):
@@ -80,24 +80,24 @@ for i in range(len(df)):
             album_data = data.json()
             album_id = album_data['albums']['items'][0]['id']
 
-            width = '"300"'
-            height = '"80"'
-            base = '<iframe src="https://open.spotify.com/embed/album/'
-            frame_border = '"0"'
-            allow_transparency = '"true"'
-            allow = '"encrypted-media'
-            code = base + album_id + '"' + ' width=' + width + ' height=' + height + ' frameborder=' + frame_border \
-                + ' allowtransparency=' + allow_transparency + ' allow=' + allow + '"></iframe>'
+            # width = '"300"'
+            # height = '"80"'
+            # base = '<iframe src="https://open.spotify.com/embed/album/'
+            # frame_border = '"0"'
+            # allow_transparency = '"true"'
+            # allow = '"encrypted-media'
+            # code = base + album_id + '"' + ' width=' + width + ' height=' + height + ' frameborder=' + frame_border \
+            #     + ' allowtransparency=' + allow_transparency + ' allow=' + allow + '"></iframe>'
         else:
             print(str(i + 1), ':', 'artist:', artist, 'album:', album, 'available: No')
-            code = "Not available"
+            album_id = "Not available"
     else:
         print(str(i + 1), ':', 'artist:', artist, 'album:', album, 'available: No')
-        code = 'Not available'
+        album_id = 'Not available'
 
-    html.append(code)
+    album_ids.append(album_id)
 
-df['html'] = pd.Series(html)
+df['album_id'] = pd.Series(album_ids)
 
 # Output data to file
-df.to_csv("data/" + site + "_" + year + "_html.csv", index=False)
+df.to_csv("data/" + site + "_" + year + "_album-ids.csv", index=False)

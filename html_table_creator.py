@@ -28,7 +28,7 @@ else:
 
 year = user_input.year
 
-filename = site + "_" + year + "_html.csv"
+filename = site + "_" + year + "_album-ids.csv"
 
 # Import album data
 df = pd.read_csv("data/" + filename)
@@ -45,13 +45,32 @@ df = df.drop(columns='review_url')
 # Create webpage header and footer content
 html_head = '''
 <html>
-    <head><title>''' + site.title() + ''''s Top Albums of ''' + year + '''</title></head>
+    <head>
+        <title>''' + site.title() + ''''s Top Albums of ''' + year + '''</title>
+    </head>
     <link rel="stylesheet" href="css/style.css"/>
+    
     <body>
-    <h1>''' + site.title() + ''''s Top Albums of ''' + year + '''</h1>
+        <div class="container">
+            <div class="centered">
+                <h1>''' + site.title() + ''''s Top Albums of ''' + year + '''</h1>
+            </div>
+        </div>
+    
+    <script type="text/javascript">
+    function getSpotfiyPlayer(album_id) {
+        var player_prefix = "<iframe src=\\\'https://open.spotify.com/embed/album/";
+        var player_suffix = "\\\' width=\\\"300\\\" height=\\\"80\\\" frameborder=\\\"0\\\" allowtransparency=\\\"true\\\" allow=\\\"encrypted-media\\\"></iframe>";
+        document.getElementById("player").innerHTML = player_prefix.concat(album_id, player_suffix);
+    }
+    </script>
 '''
+
 html_end = '''
     </body>
+    <footer>
+        <p id="player"></p>
+    </footer>
 </html>
 '''
 
@@ -60,16 +79,16 @@ outfile = site + "-" + year + ".html"
 
 with open("html/" + outfile, 'w', encoding="utf-8-sig") as f:
     f.write(html_head)
-    f.write('<table width=1280px class="center">')
-    f.write('<col style = "width:5%">')
+    f.write('<table class="center">')
     f.write('<col style = "width:5%">')
     f.write('<col style = "width:15%">')
-    f.write('<col style = "width:50%">')
-    f.write('<col style = "width:25%">')
+    f.write('<col style = "width:15%">')
+    f.write('<col style = "width:30%">')
+    f.write('<col style = "width:10%">')
     f.write('<thead>')
     f.write('<tr>')
     for header in df.columns:
-        if header == 'html':
+        if header == 'album_id':
             f.write('<th>' + "Play Album" + '</th>')
         else:
             f.write('<th>' + str(header).title() + '</th>')
@@ -80,9 +99,18 @@ with open("html/" + outfile, 'w', encoding="utf-8-sig") as f:
         f.write('<tr>')
         for col in df.columns:
             value = df.iloc[i][col]
-            f.write('<td>' + str(value) + '</td>')
-        f.write('<tr>')
-    f.write('</table>')
+            if col == 'rank':
+                f.write('<td align="center">' + str(value) + '</td>')
+            elif col == 'album_id':
+                if value == 'Not available':
+                    f.write('<td align="center">' + str(value) + '</td>')
+                else:
+                    f.write('<td align="center"><button onclick="getSpotfiyPlayer(\'' \
+                            + value + '\')">Load Player</button></td>')
+            else:
+                f.write('<td>' + str(value) + '</td>')
+        f.write('\t\t</tr>')
+    f.write('\t</table>')
     f.write(html_end)
 
 
